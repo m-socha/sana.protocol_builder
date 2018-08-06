@@ -1,6 +1,6 @@
 from xml.etree import ElementTree
 from xml.dom import minidom
-from models import Procedure, Element, AbstractElement, ShowIf
+from .models import Procedure, Element, AbstractElement, ShowIf
 import json
 
 

@@ -2,8 +2,8 @@ from collections import OrderedDict
 from rest_framework import serializers
 from rest_framework.fields import SkipField
 from django.contrib.auth.models import User
-import models
-import field
+from . import models
+from . import field
 import json
 
 

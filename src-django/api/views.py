@@ -12,12 +12,12 @@ from django.db.models import Max
 
 from api.xml_importer import ProtocolImporter
 from api import protocol_pusher
-from generator import ProtocolBuilder
+from .generator import ProtocolBuilder
 from mailer import templater, tasks
-import models
+from . import models
 import json
 import os
-import serializer
+from . import serializer
 import uuid
 
 from copy import deepcopy

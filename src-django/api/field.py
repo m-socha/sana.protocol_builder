@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from models import ShowIf
+from .models import ShowIf
 import json
 
 

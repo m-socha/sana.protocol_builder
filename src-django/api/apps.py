@@ -3,7 +3,7 @@ from django.db.models.signals import post_migrate
 
 
 def on_post_migrate(sender, **kwargs):
-    import startup
+    from . import startup
     startup.grant_permissions()
 
 

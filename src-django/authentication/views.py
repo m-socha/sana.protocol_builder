@@ -6,7 +6,7 @@ from django.core.cache import cache
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
-from forms import SignupForm
+from .forms import SignupForm
 from mailer import templater
 from mailer.tasks import send_email
 from rest_framework import status

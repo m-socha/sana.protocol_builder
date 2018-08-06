@@ -7,4 +7,4 @@ class AuthenticationConfig(AppConfig):
 
     def ready(self):
         # Register signals
-        from signals import user_post_save  # noqa
+        from .signals import user_post_save  # noqa
