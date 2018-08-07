@@ -199,7 +199,7 @@ class ProcedureViewSet(viewsets.ModelViewSet):
 
         procedure = models.Procedure.objects.get(id=procedure_id)
 
-        print((models.Procedure.objects.filter(uuid=procedure.uuid).aggregate(Max('version'))))
+        print(models.Procedure.objects.filter(uuid=procedure.uuid).aggregate(Max('version')))
         latest_version = models.Procedure.objects.filter(uuid=procedure.uuid).aggregate(Max('version'))['version__max']
 
         if not procedure:

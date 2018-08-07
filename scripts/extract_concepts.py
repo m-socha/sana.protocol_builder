@@ -12,9 +12,9 @@ for file in os.listdir("./"):
             try:
                 concepts.append(element.attributes['concept'].value)
             except KeyError:
-                print "No concept for {} in {}".format(element.attributes['type'].value, file)
+                print("No concept for {} in {}".format(element.attributes['type'].value, file))
 
-print len(concepts)
+print(len(concepts))
 concepts = Set(concepts)
 
 with open("concepts.csv", 'w+') as f:
