@@ -141,7 +141,7 @@ class ProcedureViewSet(viewsets.ModelViewSet):
                 return HttpResponseBadRequest(str(e))
 
             response = HttpResponse(protocol, content_type='application/xml')
-            response['Content-Disposition'] = 'attachment; filename="procedure.xml"'
+            response['Content-Disposition'] = 'inline'
             return response
         elif (procedure.version is current_client_version):
             return HttpResponse(status=204)
