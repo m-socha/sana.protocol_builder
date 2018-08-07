@@ -14,7 +14,7 @@ class ArrayAsStringField(serializers.Field):
         if not isinstance(data, list):
             raise serializers.ValidationError('Expected list')
 
-        if not all(isinstance(item, basestring) for item in data):
+        if not all(isinstance(item, str) for item in data):
             raise serializers.ValidationError('All choices should be strings')
 
         return json.dumps(data)
@@ -36,7 +36,7 @@ class ConditionTreeField(serializers.Field):
         return json.dumps(data)
 
     def __validate_json(self, data):
-        if 'node_type' not in data or not isinstance(data['node_type'], basestring):
+        if 'node_type' not in data or not isinstance(data['node_type'], str):
             raise serializers.ValidationError('Missing or invalid node type')
 
         if data['node_type'] in ShowIf.CRITERIA_TYPES:
@@ -46,7 +46,7 @@ class ConditionTreeField(serializers.Field):
             if 'criteria_element' in data and not isinstance(data['criteria_element'], int):
                 raise serializers.ValidationError('CRITERIA criteria_element must be an integer')
 
-            if 'value' in data and not isinstance(data['value'], basestring):
+            if 'value' in data and not isinstance(data['value'], str):
                 raise serializers.ValidationError('CRITERIA value must be a string')
         elif data['node_type'] in ShowIf.LOGICAL_TYPES:
             if 'value' in data:

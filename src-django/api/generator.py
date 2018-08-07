@@ -52,9 +52,9 @@ class ElementGenerator:
     def __init__(self, element):
         self.name = 'Element'
         self.element = element
-
-        if not self.element.concept:
-            raise_error_on_page('Element has no concept', self.element.page)
+		# concept field is currently nullable and unused
+        # if not self.element.concept:
+          #  raise_error_on_page('Element has no concept', self.element.page)
 
         if not self.element.question:
             raise_error_on_page('Element has no question', self.element.page)
@@ -76,7 +76,7 @@ class ElementGenerator:
         props = {
             'type': self.element.element_type,
             'id': str(self.element.pk),
-            'concept': self.element.concept.name,
+            'concept': ('null' if self.element.concept is None else self.element.concept.name),
             'question': self.element.question,
             'answer': self.__parse_answers()
         }
@@ -118,9 +118,9 @@ class AbstractElementGenerator:
     def __init__(self, element):
         self.name = 'AbstractElement'
         self.element = element
-
-        if not self.element.concept:
-            raise_error_on_page('Element has no concept', self.element.page)
+		# concept field is currently nullable and unused
+        #if not self.element.concept:
+            #raise_error_on_page('Element has no concept', self.element.page)
 
         if not self.element.question:
             raise_error_on_page('Element has no question', self.element.page)
@@ -285,12 +285,7 @@ class ProtocolBuilder:
         return reparsed.toprettyxml(indent=' ' * 4)[xml_header_length:]
 
     @classmethod
-    def generate_etree(cls, owner, pk):
-        try:
-            procedure = Procedure.objects.get(pk=pk)
-        except Procedure.DoesNotExist:
-            raise ValueError('Invalid procedure id')
-
+    def generate_etree(cls,procedure):
         # TODO Security issue: Allow any user (even unauthenticated) to access any procedure
         # if procedure.owner != owner:
         #     raise ValueError('Invalid owner')
@@ -307,7 +302,17 @@ class ProtocolBuilder:
                 ElementGenerator(element).generate(page_element)
 
         return procedure_etree_element
+    
+    
+    @classmethod
+    def generate_from_model(cls, procedure):
+        return cls.__prettify(cls.generate_etree(procedure))
 
     @classmethod
-    def generate(cls, owner, pk):
-        return cls.__prettify(cls.generate_etree(owner, pk))
+    def generate_from_owner_and_pk(cls, owner, pk):
+        try:
+            procedure = Procedure.objects.get(pk=pk)
+        except Procedure.DoesNotExist:
+            raise ValueError('Invalid procedure id')
+
+        return cls.generate_from_model(procedure)

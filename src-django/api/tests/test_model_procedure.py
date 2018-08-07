@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.db import IntegrityError
 from nose.tools import raises, assert_equals, assert_true, assert_is_not_none, assert_raises
 from api.models import Procedure, Page, Element, ShowIf
-from utils import factories
+from .utils import factories
 
 
 class ProcedureTest(TestCase):

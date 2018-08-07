@@ -4,8 +4,8 @@ from rest_framework.authtoken.models import Token
 from api.models import ShowIf
 from nose.tools import assert_equals, assert_true
 from api.startup import grant_permissions
-from utils.helpers import add_token_to_header
-from utils import factories
+from .utils.helpers import add_token_to_header
+from .utils import factories
 import json
 
 

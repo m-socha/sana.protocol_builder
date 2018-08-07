@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.db import IntegrityError
 from nose.tools import raises, assert_equals, assert_not_equals, assert_true, nottest
 from api.models import Page
-from utils import factories
+from .utils import factories
 
 
 class PageTest(TestCase):

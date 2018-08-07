@@ -76,8 +76,9 @@ class ProcedureViewSet(viewsets.ModelViewSet):
 
     @detail_route(methods=['get'])
     def generate(self, request, pk=None):
+        raise('FCKK')
         try:
-            protocol = ProtocolBuilder.generate(request.user, pk)
+            protocol = ProtocolBuilder.generate_from_owner_and_pk(request.user, pk)
         except ValueError as e:
             return HttpResponseBadRequest(str(e))
 
@@ -111,6 +112,44 @@ class ProcedureViewSet(viewsets.ModelViewSet):
             return HttpResponseBadRequest(str(e))
 
         return HttpResponse(status=status.HTTP_200_OK)
+    
+    @list_route(methods=['get'], permission_classes=[AllowAny], url_path='fetch_latest_xml')
+    def fetch_latest_xml(self, request):
+        """
+         Fetches the latest xml for a given procedure	
+        """
+      
+        current_client_version = None
+        procedure_uuid_param = None
+        try:
+            current_client_version = request.GET.get('current_version')
+            procedure_uuid_param = request.GET.get('uuid')
+            current_client_version = (None if current_client_version is None else int(current_client_version))
+            invalid_value_flag = (not (current_client_version is None) and current_client_version <= 0) or procedure_uuid_param is None
+            if (invalid_value_flag):
+                raise ValueError()
+        except ValueError as e:
+            return HttpResponseBadRequest('Invalid query parameters: Version must be non-zero and UUID must be provided')
+
+        procedure = models.Procedure.objects.filter(uuid=procedure_uuid_param).order_by('-version')[0]
+        if (procedure is None):
+            return HttpResponseBadRequest('Procedure with given id not found')
+        if (current_client_version is None or procedure.version > current_client_version):
+            try:
+                protocol = ProtocolBuilder.generate_from_model(procedure)
+            except ValueError as e:
+                return HttpResponseBadRequest(str(e))
+
+            response = HttpResponse(protocol, content_type='application/xml')
+            response['Content-Disposition'] = 'attachment; filename="procedure.xml"'
+            return response
+        elif (procedure.version is current_client_version):
+            return HttpResponse(status=204)
+        else:
+            # procedure.version < current_client_version  
+            return HttpResponseBadRequest('Invalid version id provided')
+      
+        
 
     @detail_route(methods=['get'], permission_classes=[AllowAny], url_path='fetch')
     def fetch_procedure_after_push(self, request, pk=None):
@@ -126,7 +165,7 @@ class ProcedureViewSet(viewsets.ModelViewSet):
             return HttpResponseBadRequest('Authentication failure!')
 
         try:
-            protocol = ProtocolBuilder.generate(request.user, pk)
+            protocol = ProtocolBuilder.generate_from_owner_and_pk(request.user, pk)
         except ValueError as e:
             return HttpResponseBadRequest(str(e))
 
@@ -160,7 +199,7 @@ class ProcedureViewSet(viewsets.ModelViewSet):
 
         procedure = models.Procedure.objects.get(id=procedure_id)
 
-        print(models.Procedure.objects.filter(uuid=procedure.uuid).aggregate(Max('version')))
+        print((models.Procedure.objects.filter(uuid=procedure.uuid).aggregate(Max('version'))))
         latest_version = models.Procedure.objects.filter(uuid=procedure.uuid).aggregate(Max('version'))['version__max']
 
         if not procedure:
@@ -430,7 +469,7 @@ class ConceptViewSet(viewsets.ModelViewSet):
             )
             copy_mapping.save()
         except (ValueError, DatabaseError):
-            expected_columns = ', '.join(ConceptViewSet.CSV_COLUMN_MAPPING.keys())
+            expected_columns = ', '.join(list(ConceptViewSet.CSV_COLUMN_MAPPING.keys()))
             return JsonResponse(
                 status=status.HTTP_400_BAD_REQUEST,
                 data={

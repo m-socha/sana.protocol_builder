@@ -32,24 +32,24 @@ def verify():
 
 def update_host():
     with cd(env.project_root), prefix(env.virtualenv), prefix('workon sana_protocol_builder'):
-        print(green('Pulling latest revision...'))
+        print((green('Pulling latest revision...')))
         run('git checkout master')
         run('git reset --hard HEAD')
         run('git pull origin master')
         run('git clean -fd')
 
         with cd(env.project_root + env.backend_dir):
-            print(green('Installing python dependencies...'))
+            print((green('Installing python dependencies...')))
             run('pip install --quiet --requirement requirements.txt')
 
-            print(green('Creating database tables...'))
+            print((green('Creating database tables...')))
             run('python manage.py migrate --noinput')
 
-            print(green('Restarting gunicorn...'))
+            print((green('Restarting gunicorn...')))
             run('supervisorctl restart gunicorn')
 
         with cd(env.project_root + env.frontend_dir):
-            print(green('Building Backbone application...'))
+            print((green('Building Backbone application...')))
             run('npm install')
             run('gulp build')
 
