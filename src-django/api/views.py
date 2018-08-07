@@ -160,7 +160,7 @@ class ProcedureViewSet(viewsets.ModelViewSet):
 
         procedure = models.Procedure.objects.get(id=procedure_id)
 
-        print(models.Procedure.objects.filter(uuid=procedure.uuid).aggregate(Max('version')))
+        print((models.Procedure.objects.filter(uuid=procedure.uuid).aggregate(Max('version'))))
         latest_version = models.Procedure.objects.filter(uuid=procedure.uuid).aggregate(Max('version'))['version__max']
 
         if not procedure:
@@ -430,7 +430,7 @@ class ConceptViewSet(viewsets.ModelViewSet):
             )
             copy_mapping.save()
         except (ValueError, DatabaseError):
-            expected_columns = ', '.join(ConceptViewSet.CSV_COLUMN_MAPPING.keys())
+            expected_columns = ', '.join(list(ConceptViewSet.CSV_COLUMN_MAPPING.keys()))
             return JsonResponse(
                 status=status.HTTP_400_BAD_REQUEST,
                 data={

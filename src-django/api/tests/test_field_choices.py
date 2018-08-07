@@ -26,5 +26,5 @@ class ArrayAsStringFieldTest(TestCase):
 
     def test_to_internal_value(self):
         result = self.field.to_internal_value(self.string_array)
-        assert_true(isinstance(result, basestring))
+        assert_true(isinstance(result, str))
         assert_equals(result, self.json_string)

@@ -1,7 +1,7 @@
 from django.test import TestCase
 from nose.tools import assert_equals, assert_not_equals
 from api.models import ShowIf
-from utils import factories
+from .utils import factories
 import json
 
 

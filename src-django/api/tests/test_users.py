@@ -6,8 +6,8 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from nose.tools import assert_equals, assert_not_equals, assert_true, assert_false, assert_is_none
 from api.startup import grant_permissions
-from utils.helpers import add_token_to_header
-from utils import factories
+from .utils.helpers import add_token_to_header
+from .utils import factories
 from mock import patch
 import json
 

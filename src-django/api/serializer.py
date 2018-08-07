@@ -36,7 +36,7 @@ class ElementSerializer(serializers.ModelSerializer):
         Object instance -> Dict of primitive datatypes.
         """
         ret = OrderedDict()
-        fields = [field for field in self.fields.values() if not field.write_only]
+        fields = [field for field in list(self.fields.values()) if not field.write_only]
 
         for field in fields:
             try:
@@ -94,7 +94,7 @@ class AbstractElementSerializer(serializers.ModelSerializer):
         Object instance -> Dict of primitive datatypes.
         """
         ret = OrderedDict()
-        fields = [field for field in self.fields.values() if not field.write_only]
+        fields = [field for field in list(self.fields.values()) if not field.write_only]
 
         for field in fields:
             try:
@@ -140,7 +140,7 @@ class PageListSerializer(serializers.ListSerializer):
         new_data_mapping = {item['id']: item for item in validated_data}
 
         result = []
-        for new_page_id, data in new_data_mapping.items():
+        for new_page_id, data in list(new_data_mapping.items()):
             page = current_page_mapping.get(new_page_id, None)
             if page is not None:
                 result.append(self.child.update(page, data))

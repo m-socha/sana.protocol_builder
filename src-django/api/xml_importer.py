@@ -9,7 +9,7 @@ import uuid
 
 def extract_attributes(element, attributes):
     extracted_dict = {}
-    for attr_name, field_name in attributes.iteritems():
+    for attr_name, field_name in attributes.items():
         if attr_name in element.attrib:
             extracted_dict[field_name] = element.attrib[attr_name]
 

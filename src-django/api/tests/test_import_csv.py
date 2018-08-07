@@ -3,8 +3,8 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from nose.tools import assert_equals, assert_true, assert_false
 from api.startup import grant_permissions
-from utils.helpers import add_token_to_header
-from utils import factories
+from .utils.helpers import add_token_to_header
+from .utils import factories
 import json
 import os
 

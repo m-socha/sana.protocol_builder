@@ -3,7 +3,7 @@ from django.test import TestCase
 from nose.tools import raises, assert_equals, assert_is_not_none, assert_true, assert_false, assert_is_none, assert_in
 from api.models import Element
 import api.generator as generators
-from utils import factories
+from .utils import factories
 import json
 
 

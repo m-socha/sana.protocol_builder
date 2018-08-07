@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.db import IntegrityError
 from nose.tools import raises, assert_equals, assert_is_not_none
 from api.models import Concept
-from utils import factories
+from .utils import factories
 
 
 class ConceptTest(TestCase):
