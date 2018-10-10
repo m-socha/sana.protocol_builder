@@ -85,4 +85,8 @@ module.exports = {
         element.click();
         document.body.removeChild(element);
     },
+
+    isValidUrl: function(url) {
+        return true;
+    },
 };
