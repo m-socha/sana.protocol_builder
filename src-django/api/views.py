@@ -544,3 +544,34 @@ class ShowIfViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         return models.ShowIf.objects.filter(page__procedure__owner_id__exact=user.id)
+
+
+class MDSInstanceViewSet(viewsets.ModelViewSet):
+    model = models.MDSInstance
+    serializer_class = serializer.MDSInstanceSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return user.mds_instance
+
+    @list_route(methods=['PATCH'])
+    def update_instance(self, request):
+        queryset = self.get_queryset()
+
+        if not request.body or 'url':
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        body = json.loads(request.body)
+        if 'url' not in body or 'api_key' not in body:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.get_serializer(
+            instance=queryset,
+            data=body,
+            partial=True
+        )
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data)
