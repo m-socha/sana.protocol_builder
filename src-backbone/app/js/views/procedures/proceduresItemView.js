@@ -9,6 +9,7 @@ module.exports = Marionette.ItemView.extend({
 
     events: {
         'click a.download': '_onDownloadProcedure',
+        'click a.push': '_pushToMDS',
         'click a.delete': '_onDeleteProcedure',
     },
 
@@ -19,6 +20,10 @@ module.exports = Marionette.ItemView.extend({
     _onDownloadProcedure: function(event) {
         event.preventDefault();
         this.model.generate();
+    },
+
+    _pushToMDS: function() {
+       console.log('push to MDS');
     },
 
     _onDeleteProcedure: function(event) {
