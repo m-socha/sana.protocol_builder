@@ -245,3 +245,14 @@ class SubroutineSerializer(serializers.ModelSerializer):
             'display_name',
             'description',
         )
+
+
+class MDSInstanceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.MDSInstance
+        fields = (
+            'id',
+            'url',
+            'api_key',
+        )
