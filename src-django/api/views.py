@@ -18,6 +18,7 @@ import json
 import os
 import serializer
 import uuid
+import requests
 
 from copy import deepcopy
 
@@ -544,3 +545,131 @@ class ShowIfViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         return models.ShowIf.objects.filter(page__procedure__owner_id__exact=user.id)
+
+
+class MDSInstanceViewSet(viewsets.ModelViewSet):
+    model = models.MDSInstance
+    serializer_class = serializer.MDSInstanceSerializer
+
+    def error_response(self, response_status, msg):
+        return JsonResponse(
+            status=response_status,
+            data={
+                'errors': [msg],
+            }
+        )
+
+    def get_mds_url(root_url, endpoint_url):
+        if not root_url.endswith('/'):
+            root_url = root_url + '/'
+        return root_url + endpoint_url
+
+    def get_queryset(self):
+        user = self.request.user
+        mds_instance, _ = models.MDSInstance.objects.get_or_create(user=user)
+        return models.MDSInstance.objects.filter(pk=mds_instance.pk)
+
+    @list_route(methods=['POST'])
+    def attempt_login(self, request):
+        if not request.body:
+            return self.error_response(
+                status.HTTP_400_BAD_REQUEST,
+                'No request body provided',
+            )
+
+        body = json.loads(request.body)
+        if 'api_url' not in body:
+            return self.error_response(
+                status.HTTP_400_BAD_REQUEST,
+                'No api_url provided',
+            )
+
+        if 'username' not in body:
+            return self.error_response(
+                status.HTTP_400_BAD_REQUEST,
+                'No username provided',
+            )
+
+        if 'password' not in body:
+            return self.error_response(
+                status.HTTP_400_BAD_REQUEST,
+                'No password provided',
+            )
+
+        mds_login_response = requests.post(
+            self.get_mds_url(body['api_url'], 'login/'),
+            data={
+                'username': body['username'],
+                'password': body['password'],
+            },
+        )
+
+        response_data = {}
+
+        # If login was successful, update the mds instance info
+        if mds_login_response.status_code == status.HTTP_200_OK:
+            # TODO: fetch session key from response
+            api_key = 'test_key'
+
+            mds_instance, _ = models.MDSInstance.objects.get_or_create(
+                user=self.request.user,
+            )
+            serializer = self.get_serializer(
+                instance=mds_instance,
+                data=body,
+                partial=True,
+            )
+
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            response_data['mds_instance'] = serializer.data
+
+        response_data['mds_status_code'] = mds_login_response.status_code
+        return Response(response_data)
+
+
+    @list_route(methods=['POST'])
+    def push_to_mds(self, request):
+        if not request.body:
+            return self.error_response(
+                status.HTTP_400_BAD_REQUEST,
+                'No request body provided',
+            )
+
+        body = json.loads(request.body)
+        if 'procedure_id' not in body:
+            return self.error_response(
+                status.HTTP_400_BAD_REQUEST,
+                'No procedure_id provided',
+            )
+
+        mds_instance, _ = models.MDSInstance.objects.get_or_create(
+            user=request.user,
+        )
+        if not mds_instance:
+            return self.error_response(
+                status.HTTP_400_BAD_REQUEST,
+                'No MDS instance priorly created',
+            )
+
+        procedure = models.Procedure.objects.get(pk=body['procedure_id'])
+        if request.user.id != procedure.owner.id:
+            return self.error_response(
+                status.HTTP_403_FORBIDDEN,
+                'You cannot access another user\'s procedure',
+            )
+
+        protocol_xml = ProtocolBuilder.generate(request.user, body['procedure_id'])
+
+        # TODO: Set authorization header
+        mds_login_response = requests.post(
+            self.get_mds_url(body['api_url'], 'push_protocol/'),
+            data={
+                'protocol_xml': protocol_xml,
+                'protocol_version': procedure.version,
+            },
+        )
+
+        return Response({
+            'mds_status_code': mds_login_response.status_code,
+        })
