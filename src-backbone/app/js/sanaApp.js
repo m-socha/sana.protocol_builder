@@ -168,10 +168,12 @@ module.exports = Marionette.Application.extend({
         let self = this;
 
         $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
-            options.url = Config.API_BASE + options.url;
+            if (!options.crossDomain) {
+                options.url = Config.API_BASE + options.url;
 
-            if (self.session.has(Session.AUTH_TOKEN_KEY)) {
-                jqXHR.setRequestHeader('Authorization', 'Token ' + self.session.get(Session.AUTH_TOKEN_KEY));
+                if (self.session.has(Session.AUTH_TOKEN_KEY)) {
+                    jqXHR.setRequestHeader('Authorization', 'Token ' + self.session.get(Session.AUTH_TOKEN_KEY));
+                }
             }
         });
     },
