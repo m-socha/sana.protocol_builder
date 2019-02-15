@@ -40,8 +40,8 @@ class PageGenerator:
         self.name = 'Page'
         self.page = page
 
-        # if not self.page.elements.all():
-        #     raise ValueError('Page with display index %d is empty' % self.page.display_index)
+        if not self.page.elements.all():
+            raise ValueError('Page with display index %d is empty' % self.page.display_index)
 
     def generate(self, parent):
         return ElementTree.SubElement(parent, self.name)
